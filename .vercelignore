@@ -1,0 +1,12 @@
+# Not part of the public site: master video exports and setup files
+/*.mp4
+/*.mov
+README.md
+firebase.json
+firestore.rules
+.firebase
+
+# Deploy script and its logs
+deploy-vercel.cmd
+vercel-*.txt
+vercel-deploy.log

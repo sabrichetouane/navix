@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>NAVIX · Admin</title>
+<meta name="theme-color" content="#020206">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin">
+
+<!-- ===== LOGIN ===== -->
+<section class="login" id="loginView" hidden>
+  <form class="login-card" id="loginForm">
+    <img src="assets/img/logo-full.png" alt="NAVIX" class="login-logo">
+    <h1>Espace admin</h1>
+    <p class="muted">Connecte-toi pour voir les demandes du formulaire.</p>
+    <label class="afield"><span>Email</span><input type="email" name="email" required autocomplete="username"></label>
+    <label class="afield"><span>Mot de passe</span><input type="password" name="password" required autocomplete="current-password"></label>
+    <button class="btn btn-primary btn-block" type="submit" id="loginBtn">Se connecter</button>
+    <button class="linkish" type="button" id="resetBtn">Mot de passe oublié ?</button>
+    <p class="login-msg" id="loginMsg"></p>
+  </form>
+</section>
+
+<!-- ===== SETUP NEEDED ===== -->
+<section class="login" id="setupView" hidden>
+  <div class="login-card">
+    <img src="assets/img/logo-full.png" alt="NAVIX" class="login-logo">
+    <h1>Firebase pas encore connecté</h1>
+    <p class="muted">Ajoute les clés Firebase dans <code>config.js</code> (voir README.md), puis recharge cette page.</p>
+    <a class="btn btn-ghost btn-block" href="admin.html?demo=1">Voir la démo avec des fausses données</a>
+  </div>
+</section>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="dash" id="dashView" hidden>
+  <header class="dash-top">
+    <div class="dash-brand">
+      <img src="assets/img/logo-mark.png" alt="">
+      <div><b>Leads</b><small><span class="live"></span><span id="liveTxt">En direct</span></small></div>
+    </div>
+    <div class="dash-actions">
+      <span class="who" id="who"></span>
+      <button class="abtn" id="csvBtn" title="Exporter CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>CSV</span>
+      </button>
+      <a class="abtn" href="index.html" target="_blank" title="Voir le site">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Site</span>
+      </a>
+      <button class="abtn" id="logoutBtn" title="Déconnexion">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H3"/></svg><span>Sortir</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <div class="demo-banner" id="demoBanner" hidden>Mode démo : fausses données, rien n'est enregistré.</div>
+
+    <section class="stats">
+      <div class="stat"><small>Total leads</small><b id="stTotal">0</b></div>
+      <div class="stat"><small>Aujourd'hui</small><b id="stToday">0</b></div>
+      <div class="stat"><small>7 derniers jours</small><b id="stWeek">0</b></div>
+      <div class="stat hi"><small>À traiter</small><b id="stNew">0</b></div>
+      <div class="stat"><small>Clients gagnés</small><b id="stWon">0</b><em id="stRate"></em></div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" placeholder="Chercher un nom ou un numéro…">
+      </div>
+      <div class="chips" id="statusChips">
+        <button class="chip on" data-s="">Tous <i id="cAll"></i></button>
+        <button class="chip" data-s="new">Nouveau <i id="cNew"></i></button>
+        <button class="chip" data-s="contacted">Contacté <i id="cContacted"></i></button>
+        <button class="chip" data-s="won">Gagné <i id="cWon"></i></button>
+        <button class="chip" data-s="lost">Perdu <i id="cLost"></i></button>
+      </div>
+      <select id="packFilter" class="aselect">
+        <option value="">Tous les packs</option>
+        <option>Starter</option><option>Growth</option><option>Scale</option>
+        <option value="-">Sans pack</option>
+      </select>
+    </section>
+
+    <section class="table-wrap">
+      <table class="leads">
+        <thead>
+          <tr>
+            <th>Date</th><th>Nom / Brand</th><th>WhatsApp</th><th>Business</th>
+            <th>Ads</th><th>Appel</th><th>Footage</th><th>Pack</th><th>Statut</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 13h4l2 3h4l2-3h4M4 13l2-8h12l2 8v6H4z"/></svg>
+        <p>Aucun lead pour le moment.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ===== DETAIL DRAWER ===== -->
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-bg" data-close></div>
+  <div class="drawer-panel">
+    <button class="drawer-x" data-close aria-label="Fermer">×</button>
+    <div id="drawerBody"></div>
+  </div>
+</aside>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="config.js"></script>
+<script type="module" src="admin.js"></script>
+</body>
+</html>
