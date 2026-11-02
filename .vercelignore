@@ -8,5 +8,8 @@ firestore.rules
 
 # Deploy script and its logs
 deploy-vercel.cmd
+push-github.cmd
+push-github.log
+push-message.txt
 vercel-*.txt
 vercel-deploy.log

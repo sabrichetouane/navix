@@ -42,6 +42,18 @@
     rio.observe(el);
   });
 
+  /* ---------- brands strip ----------
+     the HTML has the list once; a hidden copy is appended so it loops without a gap.
+     reduced motion → no copy, the logos stay still (centered, wrapping on phones) */
+  const strip = $('#brandsStrip');
+  if (strip && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const copy = $('.brands-group', strip).cloneNode(true);
+    copy.setAttribute('aria-hidden', 'true');
+    $$('img', copy).forEach(img => { img.alt = ''; });
+    strip.append(copy);
+    strip.classList.add('is-moving');
+  }
+
   /* ---------- hero video (optional) ----------
      - muted preview plays while the frame is on screen (captions are burned in)
      - click = restart from 0 with sound + native controls
